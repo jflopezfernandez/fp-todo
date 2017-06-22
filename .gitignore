@@ -1,0 +1,5 @@
+# GITIGNORE
+
+/src/*.exe
+/src/*.o
+/src/*.hi

@@ -1,19 +1,48 @@
+-- TODO LIST PROGRAM
 
--- Main Module
-
-add :: (Int, Int) -> Int
-add (x,y) = x + y
-
-sub :: (Int, Int) -> Int
-sub (x,y) = x - y
-
-mul :: (Int, Int) -> Int
-mul (x,y) = x * y
+-- Gabriel Gonzalez
+-- Source (http://www.haskellforall.com/2015/10/basic-haskell-examples.html)
 
 
--- Main Function
+-- Todo List Program
+
+putTodo :: (Int, String) -> IO ()
+putTodo (n, todo) = putStrLn (show n ++ ": " ++ todo)
+
+prompt :: [String] -> IO ()
+prompt todos = do
+    putStrLn ""
+    putStrLn "Current TODO list:"
+
+    mapM_ putTodo (zip [0..] todos)
+    command <- getLine
+    interpret command todos
+
+interpret :: String -> [String] -> IO ()
+interpret ('+':' ':todo) todos = prompt (todo:todos)
+interpret ('-':' ':num ) todos =
+    case delete (read num) todos of
+        Nothing -> do
+            putStrLn "No TODO entry matches the given number"
+            prompt todos
+        Just todos' -> prompt todos'
+interpret "q"           todos = return ()
+interpret command       todos = do
+    putStrLn ("Invalid command: " ++ command ++ " ")
+    prompt todos
+
+delete :: Int -> [a] -> Maybe [a]
+delete 0 (_:as) = Just as
+delete n (a:as) = do
+    as' <- delete (n - 1) as
+    return (a:as')
+delete _ []     = Nothing
+
 
 main = do
-    print (add(2,1))
-    print (sub(2,1))
-    print (mul(2,1))
+    putStrLn "Commands: "
+    putStrLn "+ <String>    - Add a TODO entry"
+    putStrLn "- <Int>       - Delete the numbered entry"
+    putStrLn "q             - Quit"
+
+    prompt []
